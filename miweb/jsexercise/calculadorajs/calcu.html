@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>calcu</title>
+</head>
+<body>
+    <form id="miformulario" name = "" method="post">
+        <label>Numero1</label>
+        <input type="text" name ="" id="valor1" autofocus placeholder="Escribe un numero">
+        <button onclick="limpiar();">Limpiar campos</button>
+        <br><br>
+        <label>Numero2</label>
+        <input type="text" name ="" id="valor2" placeholder="Escribe otro numero">
+        <br><br>
+        <button type="button" onclick="sumar();">sumar</button>
+        <button type="button" onclick="restar();">Restar</button>
+    
+        <button type="button" onclick="multiplicar();">Multiplicar</button>
+        <button type="button" onclick="dividir();">Dividir</button>
+        
+        <p> El resultado es: <span id="resultado"></span></p>
+    </form>
+    <script type="text/javascript" src="func.js">
+
+    </script>
+</body>
+</html>
