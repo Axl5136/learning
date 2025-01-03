@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargar Archivo</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Variables de CSS para una fácil personalización */
+        :root {
+            --primary-color: #4CAF50; /* Verde */
+            --secondary-color: #ffffff; /* Blanco */
+            --background-color: #f0f2f5; /* Gris claro */
+            --button-hover-color: #45a049;
+            --button-active-color: #3e8e41;
+            --input-border-color: #ccc;
+            --input-focus-border-color: #4CAF50;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --button-gradient: linear-gradient(45deg, #4CAF50, #45a049);
+            --button-hover-gradient: linear-gradient(45deg, #45a049, #4CAF50);
+        }
+
+        /* Aplicar la fuente global */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Contenedor principal */
+        .container {
+            background-color: var(--secondary-color);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        /* Título de la página */
+        h1 {
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        /* Estilo del formulario */
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Estilo del input de archivo */
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 2px dashed var(--primary-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        /* Cambio de color al enfocar el input */
+        input[type="file"]:focus {
+            outline: none;
+            border-color: var(--button-hover-color);
+        }
+
+        /* Estilo del botón de subir */
+        button {
+            background: var(--button-gradient);
+            color: var(--secondary-color);
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Efecto al pasar el cursor sobre el botón */
+        button:hover {
+            background: var(--button-hover-gradient);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Efecto al presionar el botón */
+        button:active {
+            background: var(--button-active-color);
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Icono dentro del botón */
+        .button-icon {
+            margin-right: 8px;
+            width: 20px;
+            height: 20px;
+            fill: #ffffff;
+            transition: fill 0.3s ease;
+        }
+
+        /* Cambio de color del icono al pasar el cursor */
+        button:hover .button-icon {
+            fill: #ffffff;
+        }
+
+        /* Mensaje de ayuda */
+        .help-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* Responsividad para pantallas pequeñas */
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 10px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cargar un Archivo para Clasificar Números</h1>
+        <form action="/uploader" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".csv, .txt" required>
+            <button type="submit">
+                <!-- Icono SVG de subir -->
+                <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
+                </svg>
+                Subir
+            </button>
+            <p class="help-text">Aceptamos archivos .csv y .txt.</p>
+        </form>
+    </div>
+</body>
+</html>
