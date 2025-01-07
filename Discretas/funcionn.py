@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 # Definir las extensiones permitidas
-ALLOWED_EXTENSIONS = {'txt'}
+ALLOWED_EXTENSIONS = {'txt', 'csv'}
 
 def allowed_file(filename):
     """Verifica si el archivo tiene una extensión permitida."""
@@ -72,52 +72,41 @@ def is_integer(s):
     except ValueError:
         return False
 
-# Función para Parsear y Clasificar el Archivo
+# Función para Parsear y Clasificar el Archivo o Texto Manual
 
-def parse_and_classify_file(file_path):
+def parse_and_classify_content(content):
     """
-    Lee un archivo y clasifica cada número encontrado.
+    Procesa el contenido (lista de líneas) y clasifica cada número.
     Retorna una lista de resultados y un diccionario de estadísticas.
     """
-    try:
-        with open(file_path, 'r') as file:
-            numbers = file.readlines()
+    results = []
+    stats = {
+        "Primo": 0,
+        "Compuesto": 0,
+        "Par": 0,
+        "Impar": 0,
+        "Perfecto": 0,
+        "Deficiente": 0
+    }
 
-        if not numbers:
-            return "El archivo está vacío.", None
-
-        results = []
-        stats = {
-            "Primo": 0,
-            "Compuesto": 0,
-            "Par": 0,
-            "Impar": 0,
-            "Perfecto": 0,
-            "Deficiente": 0
-        }
-
-        for line in numbers:
-            line = line.strip()
-            if is_integer(line):
-                num = int(line)
-                if num < 0:
-                    results.append((num, "Número negativo"))
-                    continue
-                classification = classify(num)
-                # Convertir True/False a Sí/No
-                classification_si_no = {k: ("Sí" if v else "No") for k, v in classification.items()}
-                results.append((num, classification_si_no))
-                # Actualizar estadísticas (solo contar "Sí")
-                for key, value in classification.items():
-                    if value:
-                        stats[key] += 1
-            else:
-                results.append((line, "Línea inválida"))
-        return results, stats
-    except FileNotFoundError:
-        return f"File not found: {file_path}", None
-    except Exception as e:
-        return f"An error occurred: {e}", None
+    for line in content:
+        line = line.strip()
+        if is_integer(line):
+            num = int(line)
+            if num < 0:
+                results.append((num, "Número negativo"))
+                continue
+            classification = classify(num)
+            # Convertir True/False a Sí/No
+            classification_si_no = {k: ("Sí" if v else "No") for k, v in classification.items()}
+            results.append((num, classification_si_no))
+            # Actualizar estadísticas (solo contar "Sí")
+            for key, value in classification.items():
+                if value:
+                    stats[key] += 1
+        else:
+            results.append((line, "Línea inválida"))
+    return results, stats
 
 # Función para Generar Gráfico
 
@@ -159,32 +148,56 @@ def generate_plot(stats):
 
 @app.route('/')
 def upload_file():
-    """Ruta principal para subir archivos."""
+    """Ruta principal para subir archivos y/o ingresar números manualmente."""
     return render_template('upload.html')
 
 @app.route('/uploader', methods=['POST'])
 def uploader_file():
-    """Ruta para manejar la subida y procesamiento de archivos."""
-    if 'file' not in request.files:
-        return 'No hay parte de archivo'
-    file = request.files['file']
-    if file.filename == '':
-        return 'No se ha seleccionado ningún archivo'
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file_path = os.path.join('uploads', filename)
-        os.makedirs('uploads', exist_ok=True)
-        file.save(file_path)
-        results, stats = parse_and_classify_file(file_path)
-        if stats:
-            plot = generate_plot(stats)
-        else:
-            plot = None
-        # Eliminar el archivo después de procesarlo
-        os.remove(file_path)
-        return render_template('results.html', results=results, plot=plot)
-    else:
-        return 'Archivo no permitido'
+    """Ruta para manejar la subida y procesamiento de archivos y/o números manuales."""
+    results = []
+    stats = {
+        "Primo": 0,
+        "Compuesto": 0,
+        "Par": 0,
+        "Impar": 0,
+        "Perfecto": 0,
+        "Deficiente": 0
+    }
+
+    # Procesar archivo si se ha subido
+    if 'file' in request.files:
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            try:
+                # Leer el contenido del archivo
+                file_content = file.read().decode('utf-8').splitlines()
+                clasificados, estadisticas = parse_and_classify_content(file_content)
+                results.extend(clasificados)
+                # Actualizar estadísticas
+                for key in stats:
+                    stats[key] += estadisticas.get(key, 0)
+            except Exception as e:
+                return f"Error al procesar el archivo: {e}", 400
+
+    # Procesar números manuales si se han ingresado
+    manual_numbers = request.form.get('manual_numbers')
+    if manual_numbers:
+        # Dividir por líneas
+        manual_content = manual_numbers.strip().splitlines()
+        clasificados_manual, estadisticas_manual = parse_and_classify_content(manual_content)
+        results.extend(clasificados_manual)
+        # Actualizar estadísticas
+        for key in stats:
+            stats[key] += estadisticas_manual.get(key, 0)
+
+    if not results:
+        return "No se proporcionaron números para clasificar.", 400
+
+    # Generar el gráfico si hay estadísticas
+    plot = generate_plot(stats) if any(stats.values()) else None
+
+    return render_template('results.html', results=results, plot=plot)
 
 if __name__ == '__main__':
     app.run(debug=True)
