@@ -1,10 +1,14 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request #Maneja las rutas, la lógica de la aplicación y la renderización de plantillas HTML.
 import os
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
+import matplotlib.pyplot as plt #Genera gráficos de barras que visualizan la distribución de las clasificaciones de los números procesados.
+
+import seaborn as sns #Mejora la estética y claridad de los gráficos generados con Matplotlib, facilitando la creación de gráficos más profesionales con menos código.
+
+import pandas as pd #Facilita la conversión de los datos de estadísticas en un formato que Seaborn puede utilizar para generar gráficos.
+
 import io
-import base64
+import base64 #Codifica el gráfico en base64 para poder incrustarlo directamente en el HTML como una imagen.
+
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -17,7 +21,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Funciones de Clasificación
+
 
 def prime(n):
     """Determina si un número es primo."""
